@@ -61,4 +61,4 @@ def add_device(request):
     return Response({'status': 'ok', 'device_id': device.device_id, 'name': device.name})
 
 def dashboard(request):
-    return render(request, "mdm/index.html")
+    return render(request, "templates/base/index.html")
