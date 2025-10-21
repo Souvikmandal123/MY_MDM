@@ -1,0 +1,9 @@
+Django>=4.2
+djangorestframework>=3.14
+celery>=5.3
+redis>=4.5
+paho-mqtt>=1.6
+psycopg2-binary>=2.9  # optional if you use Postgres
+python-dotenv>=1.0.0  # optional (for local env loading)
+dj-database-url==2.3.0
+
