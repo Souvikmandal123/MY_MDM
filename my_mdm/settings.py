@@ -131,9 +131,7 @@ STATICFILES_DIRS = [BASE_DIR / "static"]
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-
-DJANGO_SECRET_KEY = "tf5%p8t@buny^l_k1+-d$38ezco#)2uwf0(9wchjm8tsh01n@e"
-ALLOWED_HOSTS = "mdm-yourapp.onrender.com"
+ALLOWED_HOSTS = "my-mdm.onrender.com"
 # Celery config
 CELERY_BROKER_URL = os.environ.get("CELERY_BROKER_URL", "redis://localhost:6379/0")
 CELERY_RESULT_BACKEND = os.environ.get("CELERY_RESULT_BACKEND", CELERY_BROKER_URL)
