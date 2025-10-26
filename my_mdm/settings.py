@@ -43,6 +43,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -141,11 +142,3 @@ CELERY_RESULT_BACKEND = os.environ.get("CELERY_RESULT_BACKEND", CELERY_BROKER_UR
 CELERY_ACCEPT_CONTENT = ["json"]
 CELERY_TASK_SERIALIZER = "json"
 CELERY_RESULT_SERIALIZER = "json"
-
-# MQTT broker env vars
-MQTT_BROKER = os.environ.get("MQTT_BROKER", "broker.hivemq.com")
-MQTT_PORT = int(os.environ.get("MQTT_PORT", "1883"))
-MQTT_USER = os.environ.get("MQTT_USERNAME", "")
-MQTT_PASS = os.environ.get("MQTT_PASSWORD", "")
-MQTT_USE_TLS = os.environ.get("MQTT_USE_TLS", "0") == "1"
-MQTT_QOS = int(os.environ.get("MQTT_QOS", "1"))
