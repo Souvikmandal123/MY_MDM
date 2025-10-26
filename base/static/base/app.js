@@ -9,6 +9,7 @@ app.controller("DeviceController", function($scope, $http) {
     // Load all devices
     $scope.loadDevices = function() {
         $http.get("/api/devices/").then(function(response){
+            console.log(response.data)
             $scope.devices = response.data;
         });
     };
@@ -46,4 +47,19 @@ app.controller("DeviceController", function($scope, $http) {
     };
 
     $scope.loadDevices();
+
+
+    // Delete a device
+    $scope.deleteDevice = function(device_id) {
+        if (confirm("Are you sure you want to delete this device?")) {
+            $http.delete("/api/devices/delete/" + device_id + "/")
+            .then(function(response){
+                alert("Device deleted");
+                $scope.loadDevices();  // reload list
+            }, function(error){
+                alert("Error deleting device: " + error.data.error);
+            });
+        }
+    };
+
 });

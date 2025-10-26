@@ -13,6 +13,7 @@
 </head>
 <body ng-controller="DeviceController">
 
+
 <div class="container mt-5">
     <h2>Device Management</h2>
 
@@ -24,6 +25,7 @@
         <button class="btn btn-primary" ng-click="addDevice()">Add Device</button>
     </div>
 
+    {% verbatim %}
     <!-- Device list -->
     <div class="card p-3 mb-3">
         <h5>Devices</h5>
@@ -34,9 +36,11 @@
                     <th>Device ID</th>
                     <th>Name</th>
                     <th>Last Seen</th>
+                    <th>Actions</th>
                 </tr>
             </thead>
             <tbody>
+                <p>Loaded devices: {{ devices.length }}</p>
                 <tr ng-repeat="device in devices">
                     <td>
                         <input type="radio" ng-model="$parent.selectedDevice" ng-value="device">
@@ -44,10 +48,15 @@
                     <td>{{device.device_id}}</td>
                     <td>{{device.name}}</td>
                     <td>{{device.last_seen | date:'short'}}</td>
+                    <td>
+                        <button class="btn btn-danger btn-sm" ng-click="deleteDevice(device.device_id)">Delete</button>
+                    </td>
                 </tr>
             </tbody>
+
         </table>
     </div>
+    {% endverbatim %}
 
     <!-- Send command -->
     <div class="card p-3 mb-3">

@@ -1,9 +1,11 @@
 from django.urls import path
 from base.views import *
+from . import views
 
 urlpatterns = [
     path("", dashboard, name="dashboard"),
     path("api/create_command/", create_command, name="create_command"),
     path("api/devices/", list_devices, name="list_devices"),
     path("api/devices/add/", add_device, name="add_device"),
+    path('api/devices/delete/<int:device_id>/', views.delete_device, name='delete_device'),
 ]

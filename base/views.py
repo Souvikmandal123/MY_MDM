@@ -2,46 +2,42 @@ from django.shortcuts import render
 
 # Create your views here.
 import uuid
+import json
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from django.utils import timezone
 
 from base.models import Device, Command
 from base.tasks import send_command_task
+from django.http import JsonResponse
+from .models import Device
+from django.views.decorators.csrf import csrf_exempt
+from base.mqtt_client import publish_command 
 
-@api_view(["POST"])
+@csrf_exempt
 def create_command(request):
-    """
-    POST /api/create_command/
-    body: {"device_id": "device001", "command": "ls -la"}
-    """
-    device_id = request.data.get("device_id")
-    command_text = request.data.get("command")
-    if not device_id or not command_text:
-        return Response({"error": "device_id and command required"}, status=400)
+    if request.method != "POST":
+        return JsonResponse({"error": "Invalid request"}, status=400)
 
-    try:
-        device = Device.objects.get(device_id=device_id)
-    except Device.DoesNotExist:
-        return Response({"error": "Device not found"}, status=404)
+    data = json.loads(request.body)
+    device_id = data.get("device_id")
+    command_text = data.get("command")
 
     command_id = str(uuid.uuid4())
-    cmd = Command.objects.create(
-        command_id=command_id,
-        device=device,
-        command=command_text,
-        status="queued",
-        created_at=timezone.now()
+    device = Device.objects.get(device_id = device_id)
+
+    Command.objects.create(
+        command_id = command_id,
+        device = device,
+        command = command_text,
+        status = "queued",
+        created_at = timezone.now()
     )
 
-    # enqueue Celery task to publish to MQTT
-    send_command_task.delay(device_id, command_id, command_text)
+    # Publish to MQTT
+    publish_command(device_id, command_id, command_text)
 
-    return Response({
-        "status": "queued",
-        "command_id": command_id,
-        "device_id": device_id
-    })
+    return JsonResponse({"command_id": command_id})
 
 
 @api_view(['GET'])
@@ -62,3 +58,14 @@ def add_device(request):
 
 def dashboard(request):
     return render(request, "base/index.html")
+
+@csrf_exempt
+def delete_device(request, device_id):
+    if request.method == "DELETE":
+        try:
+            device = Device.objects.get(device_id=device_id)
+            device.delete()
+            return JsonResponse({"status": "success", "message": "Device deleted"})
+        except Device.DoesNotExist:
+            return JsonResponse({"error": "Device not found"}, status=404)
+    return JsonResponse({"error": "Invalid request method"}, status=400)
