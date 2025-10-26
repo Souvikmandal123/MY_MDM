@@ -1,6 +1,6 @@
 import uuid
 from celery import shared_task
-from .mqtt_utils import publish_command
+from .mqtt_client import publish_command
 from .models import Command
 
 @shared_task(bind=True)
