@@ -69,3 +69,36 @@ def delete_device(request, device_id):
         except Device.DoesNotExist:
             return JsonResponse({"error": "Device not found"}, status=404)
     return JsonResponse({"error": "Invalid request method"}, status=400)
+
+
+@csrf_exempt
+def update_command_status(request):
+    if request.method != "POST":
+        return JsonResponse({"error": "Invalid request"}, status=400)
+
+    try:
+        data = json.loads(request.body)
+        device_id = data.get("device_id")
+        command_id = data.get("command_id")
+        status = data.get("status")
+        output = data.get("output", "")
+
+        if not all([device_id, command_id, status]):
+            return JsonResponse({"error": "Missing required fields"}, status=400)
+
+        device = Device.objects.get(device_id=device_id)
+        command = Command.objects.get(command_id=command_id, device=device)
+
+        command.status = status
+        command.result = output
+        command.result_received_at = timezone.now()
+        command.save()
+
+        return JsonResponse({"message": "Status updated successfully"})
+
+    except Device.DoesNotExist:
+        return JsonResponse({"error": "Device not found"}, status=404)
+    except Command.DoesNotExist:
+        return JsonResponse({"error": "Command not found"}, status=404)
+    except Exception as e:
+        return JsonResponse({"error": str(e)}, status=500)
