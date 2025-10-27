@@ -1,6 +1,4 @@
-from django.shortcuts import render
-
-# Create your views here.
+from django.shortcuts import render, get_object_or_404
 import uuid
 import json
 from rest_framework.decorators import api_view
@@ -10,7 +8,7 @@ from django.utils import timezone
 from base.models import Device, Command
 from base.tasks import send_command_task
 from django.http import JsonResponse
-from .models import Device
+from base.models import *
 from django.views.decorators.csrf import csrf_exempt
 from base.mqtt_client import publish_command 
 
@@ -102,3 +100,39 @@ def update_command_status(request):
         return JsonResponse({"error": "Command not found"}, status=404)
     except Exception as e:
         return JsonResponse({"error": str(e)}, status=500)
+
+   
+def list_devices(request):
+    devices = Device.objects.all().values("id", "device_id", "name", "last_seen")
+    return JsonResponse(list(devices), safe=False)
+
+
+# HTML page view
+def device_detail_page(request, device_id):
+    return render(request, "base/device_detail.html", {"device_id": device_id})
+
+
+# API endpoint for AngularJS to load details
+
+
+def device_detail_api(request, device_id):
+    device = get_object_or_404(Device, id=device_id)
+    details = getattr(device, 'details', None)
+
+    data = {
+        "id": device.id,
+        "device_id": device.device_id,
+        "name": device.name,
+        "last_seen": device.last_seen,
+        "manufacturer": details.manufacturer if details else None,
+        "model": details.model if details else None,
+        "os_version": details.os_version if details else None,
+        "ip_address": details.ip_address if details else None,
+        "battery": details.battery if details else None,
+        "location": details.location if details else None,
+        "encryption": details.encryption if details else None,
+        "compliance_status": details.compliance_status if details else None,
+        "last_sync": details.last_sync if details else None,
+    }
+
+    return JsonResponse(data)

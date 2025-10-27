@@ -45,7 +45,7 @@
                     <td>
                         <input type="radio" ng-model="$parent.selectedDevice" ng-value="device">
                     </td>
-                    <td>{{device.device_id}}</td>
+                    <td><a href="/device/{{device.id}}/">{{device.device_id}}</a></td>
                     <td>{{device.name}}</td>
                     <td>{{device.last_seen | date:'short'}}</td>
                     <td>

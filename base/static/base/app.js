@@ -63,3 +63,17 @@ app.controller("DeviceController", function($scope, $http) {
     };
 
 });
+
+
+app.controller("DeviceDetailController", function($scope, $http, $window) {
+    const pathParts = $window.location.pathname.split("/");
+    const deviceId = pathParts[pathParts.length - 2]; // e.g., /device/5/
+
+    $scope.device = null;
+
+    $http.get(`/api/device/${deviceId}/`).then(function(response) {
+        $scope.device = response.data;
+    }, function(error) {
+        console.error("Error loading device details:", error);
+    });
+});
