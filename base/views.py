@@ -86,8 +86,8 @@ def update_command_status(request):
         if not all([device_id, command_id, status]):
             return JsonResponse({"error": "Missing required fields"}, status=400)
 
-        device = Device.objects.get(device_id=device_id)
-        command = Command.objects.get(command_id=command_id, device=device)
+        # device = Device.objects.get(device_id=device_id)
+        command = Command.objects.get(command_id=command_id)
 
         command.status = status
         command.result = output
