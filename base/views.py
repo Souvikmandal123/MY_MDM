@@ -136,3 +136,44 @@ def device_detail_api(request, device_id):
     }
 
     return JsonResponse(data)
+
+
+@csrf_exempt
+def update_device_details(request, device_id):
+    if request.method == "POST":
+        data = json.loads(request.body)
+        device = get_object_or_404(Device, id=device_id)
+
+        # Create or update extra details
+        details, created = DeviceDetails.objects.update_or_create(
+            device=device,
+            defaults={
+                "manufacturer": data.get("manufacturer"),
+                "model": data.get("model"),
+                "os_version": data.get("os_version"),
+                "ip_address": data.get("ip_address"),
+                "battery": data.get("battery"),
+                "location": data.get("location"),
+            }
+        )
+        return JsonResponse({"status": "success"})
+    return JsonResponse({"error": "Invalid method"}, status=405)
+
+
+@csrf_exempt
+def fetch_pending_command(request):
+    if request.method == "GET":
+        # Fetch commands with 'sent' status for that device
+        commands = Command.objects.filter(status='sent')
+
+        pending_commands = []
+        for command in commands:
+            pending_commands.append({
+                "uuid": str(command.command_id),
+                "device_id": command.device.device_id,
+                "command": command.command,
+            })
+
+        return JsonResponse({"pending_commands": pending_commands}, safe=False)
+
+    return JsonResponse({"error": "Invalid request method"}, status=405)
