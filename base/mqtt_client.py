@@ -5,10 +5,10 @@ from base.models import *
 
 # Read broker info from environment
 
-MQTT_BROKER = "d0365b492a9a43e9b554a8c64db33572.s1.eu.hivemq.cloud"
+MQTT_BROKER = "3fdd414487574679ac24d35b27bad7dd.s1.eu.hivemq.cloud"
 MQTT_PORT = 8883
-MQTT_USERNAME = "hivemq.webclient.1761500101022"
-MQTT_PASSWORD = "cgR0d18Vf!3#zy*UDT&S"
+MQTT_USERNAME = "mdm_mqtt"
+MQTT_PASSWORD = "Souvik@123"
 MQTT_TLS = True
 
 

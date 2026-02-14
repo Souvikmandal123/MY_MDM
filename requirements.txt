@@ -8,4 +8,5 @@ python-dotenv>=1.0.0  # optional (for local env loading)
 dj-database-url==2.3.0
 gunicorn>=20.1.0
 whitenoise==6.11.0
+dj-database-url==3.0.1
 
