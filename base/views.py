@@ -11,6 +11,7 @@ from django.http import JsonResponse
 from base.models import *
 from django.views.decorators.csrf import csrf_exempt
 from base.mqtt_client import publish_command 
+from django.views.decorators.http import require_http_methods
 
 @csrf_exempt
 def create_command(request):
@@ -177,3 +178,38 @@ def fetch_pending_command(request):
         return JsonResponse({"pending_commands": pending_commands}, safe=False)
 
     return JsonResponse({"error": "Invalid request method"}, status=405)
+
+
+
+@csrf_exempt
+@require_http_methods(["POST"])
+def battery_info(request, pk):
+    """Receive battery payload and update device battery_charge.
+
+    Expected JSON payload: { "batteryCharge": 85 }
+    Also accepts a JSON array with a single value: [85]
+    """
+    device = get_object_or_404(Device, pk=pk)
+
+    try:
+        data = json.loads(request.body.decode('utf-8')) if request.body else {}
+    except Exception:
+        return JsonResponse({'error': 'invalid JSON'}, status=400)
+
+    # Support either object with batteryCharge or a simple list [value]
+    battery_value = None
+    if isinstance(data, dict):
+        battery_value = data.get('battery_charge')
+    elif isinstance(data, list) and len(data) > 0:
+        battery_value = data[0]
+
+    if battery_value is None:
+        return JsonResponse({'error': 'battery_charge not provided'}, status=400)
+
+    try:
+        device.battery_charge = float(battery_value)
+        device.save()
+    except (ValueError, TypeError):
+        return JsonResponse({'error': 'battery_charge must be a number'}, status=400)
+
+    return JsonResponse({'device_id': device.device_id, 'battery_charge': device.battery_charge})

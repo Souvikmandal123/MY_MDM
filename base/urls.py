@@ -13,4 +13,5 @@ urlpatterns = [
     path('api/device/<int:device_id>/', views.device_detail_api, name='device_detail_api'),
     path("api/device/<int:device_id>/update/", views.update_device_details, name="update_device_details"),
     path('api/fetch_command/', views.fetch_pending_command, name="fetch_pending_command"),
+    path('<int:pk>/batteryInfo/', views.battery_info, name='battery_info'),
 ]
