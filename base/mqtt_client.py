@@ -2,6 +2,7 @@ import paho.mqtt.client as mqtt
 import os
 import json
 from base.models import *
+import paho.mqtt.client as mqtt
 
 # Read broker info from environment
 
@@ -25,15 +26,28 @@ client.connect(MQTT_BROKER, MQTT_PORT)
 client.loop_start()
 
 
+# def publish_command(device_id, command_id, command_text):
+#     """Publish a command to a specific device topic"""
+#     topic = f"devices/{device_id}/commands"
+#     payload = json.dumps({
+#         "command_id": command_id,
+#         "command": command_text
+#     })
+#     client.publish(topic, payload)
+#     print(f"Published to {topic}: {payload}")
+#     cmd_status = Command.objects.get(command_id = command_id)
+#     cmd_status.status = "sent"
+#     cmd_status.save()
+
 def publish_command(device_id, command_id, command_text):
-    """Publish a command to a specific device topic"""
-    topic = f"devices/{device_id}/commands"
-    payload = json.dumps({
-        "command_id": command_id,
-        "command": command_text
-    })
-    client.publish(topic, payload)
-    print(f"Published to {topic}: {payload}")
-    cmd_status = Command.objects.get(command_id = command_id)
-    cmd_status.status = "sent"
-    cmd_status.save()
+    client = mqtt.Client()
+    client.connect("broker.hivemq.com", 1883, 60)
+
+    client.loop_start()  # start network loop
+
+    topic = f"DeviceID_{device_id}"
+    result = client.publish(topic, "PendingActions", qos=1)
+    result.wait_for_publish()  # BLOCK until sent
+
+    client.loop_stop()
+    client.disconnect()
