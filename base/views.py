@@ -189,6 +189,7 @@ def battery_info(request, pk):
     Expected JSON payload: { "batteryCharge": 85 }
     Also accepts a JSON array with a single value: [85]
     """
+    print("coming to update battery details.......................................")
     device = get_object_or_404(Device, pk=pk)
 
     try:
@@ -202,6 +203,8 @@ def battery_info(request, pk):
         battery_value = data.get('battery_charge')
     elif isinstance(data, list) and len(data) > 0:
         battery_value = data[0]
+    print("battery vlue ...........")
+    print(battery_value)
 
     if battery_value is None:
         return JsonResponse({'error': 'battery_charge not provided'}, status=400)
